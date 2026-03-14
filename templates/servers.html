@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto mt-8">
+    <div class="text-center mb-12">
+        <h1 class="text-3xl font-bold mb-2">Select a Server</h1>
+        <p class="text-gray-400">Choose a server you have administrator access to start configuring.</p>
+    </div>
+
+    {% if guilds|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for server in guilds %}
+        <a href="/dashboard/{{ server.id }}/home"
+            class="group bg-cardbg rounded-2xl p-6 border border-gray-800 hover:border-accent/50 hover:shadow-[0_0_20px_rgba(0,168,255,0.15)] transition duration-300 relative overflow-hidden flex items-center gap-4">
+            <!-- Glow background on hover -->
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-300">
+            </div>
+
+            {% if server.icon %}
+            <img src="https://cdn.discordapp.com/icons/{{ server.id }}/{{ server.icon }}.png"
+                class="w-16 h-16 rounded-full bg-gray-900 border border-gray-700 shadow-md relative z-10" alt="Icon">
+            {% else %}
+            <div
+                class="w-16 h-16 rounded-full bg-gray-800 border border-gray-700 flex items-center justify-center text-2xl font-bold shadow-md relative z-10">
+                {{ server.name[0] }}</div>
+            {% endif %}
+
+            <div class="relative z-10">
+                <h3 class="font-bold text-lg text-white group-hover:text-accent transition">{{ server.name }}</h3>
+                <p class="text-sm text-gray-400">Manage Settings ➔</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center bg-cardbg border border-gray-800 rounded-xl p-12 max-w-2xl mx-auto">
+        <div class="text-6xl mb-4">🥲</div>
+        <h3 class="text-xl font-bold mb-2">No Manageable Servers Found</h3>
+        <p class="text-gray-400">It doesn't look like you have `ADMINISTRATOR` or `MANAGE_GUILD` permissions in any
+            servers. Please make sure you are logged into the correct Discord account.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

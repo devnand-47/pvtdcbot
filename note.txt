@@ -1,0 +1,26 @@
+https://discord.com/oauth2/authorize?client_id=1445765620053446788&permissions=8&response_type=code&redirect_uri=https%3A%2F%2Fdiscord.com%2Foauth2%2Fauthorize%3Fclient_id%3D1445765620053446788%26permissions%3D8%26integration_type%3D0%26scope%3Dbot&integration_type=0&scope=bot+applications.commands.permissions.update
+http://127.0.0.1:8000/
+
+cd /root/DCBOTS/c2bot
+tmux new -s bot -d "./run_bot.sh"
+tmux new -s dash -d "./run_dashboard.sh"
+
+cd /root/DCBOTS/c2bot
+source venv/bin/activate
+uvicorn dashboard:app --host 0.0.0.0 --port 8000
+
+
+tmux kill-server
+tmux kill-session -t bot
+tmux new -s bot -d "./run_bot.sh"
+tmux attach -t dash
+
+5. View logs if you want
+
+Attach to a session:
+
+tmux attach -t bot      # see bot.py output
+# Ctrl+B then D  -> to detach again
+
+tmux attach -t dash     # see uvicorn dashboard output
+# Ctrl+B then D        -> to deta

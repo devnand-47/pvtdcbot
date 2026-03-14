@@ -1,0 +1,15 @@
+[2025-04-28T13:10:30.535000+00:00] Birthday Bot#8358 (470673087671566366): 
+[2025-04-28T13:11:11.181000+00:00] Birthday Bot#8358 (470673087671566366): 
+[2025-05-11T09:13:25.476000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: The birthday role has been set to **Birthday**.
+[2025-05-11T09:13:49.170000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: Your birthday has been set to **15-Jul**.\n(Tip: The `/birthday set timezone` command ensures your birthday is recognized just in time!)
+[2025-05-11T09:14:33.623000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: The announcement channel has been unset.
+[2025-05-11T09:15:03.131000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: The announcement channel has been unset.
+[2025-05-11T09:15:23.833000+00:00] Birthday Bot#8358 (470673087671566366): 
+[2025-05-11T09:16:32.925000+00:00] Birthday Bot#8358 (470673087671566366): 
+[2025-05-11T09:16:59.102000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: Your birthday has been set to **15-Jul**.\n(Tip: The `/birthday set timezone` command ensures your birthday is recognized just in time!)
+[2025-05-11T09:17:57.046000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: Your time zone has been set to **Asia/Kolkata**.
+[2025-06-08T10:24:10.786000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: Your birthday has been set to **11-Apr**.\n(Tip: The `/birthday set timezone` command ensures your birthday is recognized just in time!)
+[2025-07-15T16:31:40.914000+00:00] Dyno#3861 (155149108183695360): 
+[2026-01-12T07:25:06.375000+00:00] Birthday Bot#8358 (470673087671566366): :white_check_mark: Your birthday has been set to **10-Jan**.\n(Tip: The `/birthday set timezone` command ensures your birthday is recognized just in time!)
+[2026-02-21T23:13:10.135000+00:00] ninja_x_gaming (844308783814410241): happy Birthday <@591072166771032076> 💞🫶🥳
+[2026-02-22T04:49:45.060000+00:00] itsno7 (591072166771032076): Thank you <a:7228planetrainbowheart:1221057654785310721>

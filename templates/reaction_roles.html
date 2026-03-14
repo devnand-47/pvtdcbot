@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}UltimateBot - Reaction Roles{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex items-center justify-between">
+    <h1
+        class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center gap-2">
+        <i class="fa-solid fa-list-check text-blue-400"></i> Reaction Roles
+    </h1>
+    <a href="/dashboard/{{ guild['id'] }}" class="text-gray-400 hover:text-white transition-colors">
+        <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+    </a>
+</div>
+
+<p class="text-gray-400 mb-8 max-w-2xl">
+    Create beautiful, embedded messages with interactive buttons that automatically assign roles when clicked!
+    Select the channel, write the message, and assign up to 10 dynamic roles per panel.
+</p>
+
+{% if success %}
+<div
+    class="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded mb-6 flex items-center shadow-lg">
+    <i class="fa-solid fa-check-circle mr-2"></i> Reaction Role panel successfully deployed to your server!
+</div>
+{% endif %}
+{% if error %}
+<div class="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded mb-6 flex items-center shadow-lg">
+    <i class="fa-solid fa-triangle-exclamation mr-2"></i> Error deploying panel: {{ error }}
+</div>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <!-- Column 1: Builder Form -->
+    <div class="border border-gray-700/50 bg-gray-800/30 rounded-lg p-6 backdrop-blur-sm shadow-xl">
+        <h2 class="text-xl font-semibold mb-6 text-white border-b border-gray-700 pb-2">
+            <i class="fa-solid fa-hammer text-indigo-400 mr-2"></i> Panel Builder
+        </h2>
+
+        <form action="/dashboard/{{ guild['id'] }}/reaction_roles/deploy" method="POST" id="rrForm">
+            <!-- Channel Settings -->
+            <div class="mb-6 bg-gray-900/40 p-4 rounded border border-gray-700/50">
+                <h3 class="text-lg font-medium text-gray-200 mb-4"><i
+                        class="fa-solid fa-location-arrow text-gray-400 mr-2"></i> Destination</h3>
+                <label class="block text-gray-400 text-sm font-bold mb-2">Target Channel *</label>
+                <select name="channel_id" required
+                    class="w-full bg-gray-800 border border-gray-600 rounded py-2 px-3 text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                    <option value="">-- Select a Text Channel --</option>
+                    {% for c in bot_guild['channels'] %}
+                    <option value="{{ c['id'] }}">#{{ c['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Embed Settings -->
+            <div class="mb-6 bg-gray-900/40 p-4 rounded border border-gray-700/50">
+                <h3 class="text-lg font-medium text-gray-200 mb-4"><i
+                        class="fa-solid fa-message text-gray-400 mr-2"></i> Embed Design</h3>
+                <div class="mb-4">
+                    <label class="block text-gray-400 text-sm font-bold mb-2">Panel Title</label>
+                    <input type="text" name="panel_title" placeholder="e.g. Select Your Game Roles"
+                        class="w-full bg-gray-800 border border-gray-600 rounded py-2 px-3 text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm font-bold mb-2">Panel Description</label>
+                    <textarea name="panel_desc" rows="3"
+                        placeholder="e.g. Click the buttons below to gain access to specific channels!"
+                        class="w-full bg-gray-800 border border-gray-600 rounded py-2 px-3 text-white focus:outline-none focus:border-indigo-500 transition-colors"></textarea>
+                </div>
+            </div>
+
+            <!-- Roles container -->
+            <div class="mb-6 bg-gray-900/40 p-4 rounded border border-gray-700/50">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-200"><i class="fa-solid fa-tags text-gray-400 mr-2"></i>
+                        Buttons (Roles)</h3>
+                    <button type="button" id="addRoleBtn"
+                        class="text-xs bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40 py-1 px-3 rounded transition-colors">
+                        <i class="fa-solid fa-plus mr-1"></i> Add Button
+                    </button>
+                </div>
+
+                <div id="rolesContainer" class="space-y-4">
+                    <!-- Default first role row -->
+                    <div
+                        class="role-row flex flex-col md:flex-row gap-3 p-3 bg-gray-800/80 rounded border border-gray-700 items-start md:items-center">
+                        <div class="w-full md:w-1/3">
+                            <select name="role_id_1" required
+                                class="w-full bg-gray-900 border border-gray-600 rounded py-1.5 px-2 text-white text-sm focus:outline-none focus:border-indigo-500">
+                                <option value="">-- Choose Role --</option>
+                                {% for r in bot_guild['roles'] %}
+                                <option value="{{ r['id'] }}" style="color: {{ r['color'] }}">{{ r['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <input type="text" name="label_1" required placeholder="Button Text"
+                                class="w-full bg-gray-900 border border-gray-600 rounded py-1.5 px-2 text-white text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="w-full md:w-1/6">
+                            <input type="text" name="emoji_1" placeholder="Emoji 🎮"
+                                class="w-full bg-gray-900 border border-gray-600 rounded py-1.5 px-2 text-white text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div class="w-full md:w-1/6">
+                            <select name="style_1"
+                                class="w-full bg-gray-900 border border-gray-600 rounded py-1.5 px-2 text-white text-sm focus:outline-none focus:border-indigo-500">
+                                <option value="primary">Blurple</option>
+                                <option value="secondary">Gray</option>
+                                <option value="success">Green</option>
+                                <option value="danger">Red</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-3 px-4 rounded transition-all shadow-lg flex items-center justify-center gap-2 group">
+                <i class="fa-solid fa-rocket group-hover:animate-bounce"></i> Deploy Panel to Discord
+            </button>
+        </form>
+    </div>
+
+    <!-- Column 2: Active Panels (History) -->
+    <div class="border border-gray-700/50 bg-gray-800/30 rounded-lg p-6 backdrop-blur-sm self-start shadow-xl">
+        <h2 class="text-xl font-semibold mb-6 text-white border-b border-gray-700 pb-2">
+            <i class="fa-solid fa-server text-blue-400 mr-2"></i> Active Panels
+        </h2>
+
+        {% if panels_list %}
+        <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+            {% for panel in panels_list %}
+            <div class="bg-gray-900/60 border border-gray-700 rounded p-4 hover:border-gray-500 transition-colors">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span class="text-xs text-gray-500 font-mono">MSG ID: {{ panel['message_id'] }}</span>
+                        <div class="text-gray-300 text-sm mt-1">
+                            <i class="fa-solid fa-hashtag text-gray-500 mr-1"></i>
+                            {% set ch_name = "Unknown Channel" %}
+                            {% for c in bot_guild['channels'] %}
+                            {% if str(c['id']) == str(panel['channel_id']) %}
+                            {% set ch_name = c['name'] %}
+                            {% endif %}
+                            {% endfor %}
+                            {{ ch_name }}
+                        </div>
+                    </div>
+                    <div
+                        class="bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded font-bold border border-blue-500/30">
+                        {{ panel['roles_data']|length }} Roles
+                    </div>
+                </div>
+
+                <!-- Preview the buttons -->
+                <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-800">
+                    {% for r in panel['roles_data'] %}
+                    {% set bg_class = "bg-indigo-600" %}
+                    {% if r.get("style") == "secondary" %} {% set bg_class = "bg-gray-600" %} {% endif %}
+                    {% if r.get("style") == "success" %} {% set bg_class = "bg-green-600" %} {% endif %}
+                    {% if r.get("style") == "danger" %} {% set bg_class = "bg-red-600" %} {% endif %}
+
+                    <span class="text-xs {{ bg_class }} text-white px-2 py-1 rounded opacity-90 shadow-sm">
+                        {{ r.get("emoji", "") }} {{ r.get("label", "Role") }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div
+            class="text-center py-12 bg-gray-900/30 rounded border border-dashed border-gray-700 flex flex-col items-center">
+            <i class="fa-solid fa-box-open text-gray-600 text-4xl mb-3"></i>
+            <p class="text-gray-400 text-lg">No active role panels.</p>
+            <p class="text-gray-500 text-sm mt-1">Deploy your first Reaction Role menu using the builder!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const container = document.getElementById("rolesContainer");
+        const addBtn = document.getElementById("addRoleBtn");
+        let rowCount = 1;
+
+        addBtn.addEventListener("click", function () {
+            if (rowCount >= 10) {
+                alert("Maximum of 10 roles per panel.");
+                return;
+            }
+            rowCount++;
+
+            // Clone the first row as a template
+            const firstRow = container.querySelector(".role-row");
+            const newRow = firstRow.cloneNode(true);
+
+            // Update names and clear values
+            newRow.querySelector("select[name^='role_id']").name = `role_id_${rowCount}`;
+            newRow.querySelector("select[name^='role_id']").value = "";
+
+            newRow.querySelector("input[name^='label']").name = `label_${rowCount}`;
+            newRow.querySelector("input[name^='label']").value = "";
+
+            newRow.querySelector("input[name^='emoji']").name = `emoji_${rowCount}`;
+            newRow.querySelector("input[name^='emoji']").value = "";
+
+            newRow.querySelector("select[name^='style']").name = `style_${rowCount}`;
+            newRow.querySelector("select[name^='style']").value = "primary";
+
+            // Add a remove button
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.className = "w-full md:w-auto mt-2 md:mt-0 md:ml-2 text-red-500 hover:text-red-400 p-1 bg-red-500/10 rounded transition-colors";
+            removeBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            removeBtn.onclick = function () {
+                container.removeChild(newRow);
+                // re-indexing is handled by the backend iterating 1-10
+            };
+
+            newRow.appendChild(removeBtn);
+            container.appendChild(newRow);
+        });
+    });
+</script>
+{% endblock %}

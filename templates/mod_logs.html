@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight">Moderation Logs</h2>
+            <p class="text-gray-400 mt-1 text-sm">Review warnings and server infractions.</p>
+        </div>
+        <div
+            class="w-12 h-12 bg-accent/20 rounded-xl border border-accent/30 flex items-center justify-center text-accent">
+            <i class="fa-solid fa-gavel text-xl"></i>
+        </div>
+    </div>
+
+    <!-- Mod Actions Table -->
+    {% if mod_actions %}
+    <div class="bg-cardbg rounded-xl border border-gray-800 overflow-hidden shadow-2xl relative">
+        <div class="px-6 py-4 border-b border-gray-800 bg-gray-900/50 flex justify-between items-center">
+            <h3 class="text-lg font-semibold flex items-center gap-2"><i class="fa-solid fa-shield text-accent"></i>
+                Core Moderation Actions</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-darkblue/50 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 border-b border-gray-800">Date/Time</th>
+                        <th class="px-6 py-3 border-b border-gray-800">Action</th>
+                        <th class="px-6 py-3 border-b border-gray-800">User ID</th>
+                        <th class="px-6 py-3 border-b border-gray-800">Moderator ID</th>
+                        <th class="px-6 py-3 border-b border-gray-800">Reason</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-gray-800">
+                    {% for log in mod_actions %}
+                    <tr class="hover:bg-gray-800/30 transition">
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-300">{{ log.timestamp }}</td>
+                        <td class="px-6 py-4"><span
+                                class="px-2 py-1 bg-blue-500/10 text-blue-400 rounded-md font-medium text-xs">{{
+                                log.action }}</span></td>
+                        <td class="px-6 py-4 font-mono text-gray-400">{{ log.user_id }}</td>
+                        <td class="px-6 py-4 font-mono text-gray-400">{{ log.moderator_id }}</td>
+                        <td class="px-6 py-4 text-gray-300 max-w-xs truncate" title="{{ log.reason }}">{{ log.reason }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Warnings Table -->
+    <div class="bg-cardbg rounded-xl border border-gray-800 overflow-hidden shadow-2xl relative">
+        <div class="px-6 py-4 border-b border-gray-800 bg-gray-900/50 flex justify-between items-center">
+            <h3 class="text-lg font-semibold flex items-center gap-2"><i
+                    class="fa-solid fa-triangle-exclamation text-yellow-500"></i> Server Warnings</h3>
+        </div>
+        {% if warnings %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-darkblue/50 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 border-b border-gray-800">Date (Timestamp)</th>
+                        <th class="px-6 py-3 border-b border-gray-800">Warned User ID</th>
+                        <th class="px-6 py-3 border-b border-gray-800">Actor ID</th>
+                        <th class="px-6 py-3 border-b border-gray-800">Reason</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-gray-800">
+                    {% for warn in warnings %}
+                    <tr class="hover:bg-gray-800/30 transition">
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-300">{{ warn.created_at }}</td>
+                        <td class="px-6 py-4 font-mono text-gray-400">{{ warn.user_id }}</td>
+                        <td class="px-6 py-4 font-mono text-gray-400">{{ warn.actor_id }}</td>
+                        <td class="px-6 py-4 text-gray-300 max-w-xs truncate" title="{{ warn.reason }}">{{ warn.reason
+                            }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-gray-500">
+            <i class="fa-regular fa-folder-open text-4xl mb-3 opacity-50"></i>
+            <p>No warnings have been issued yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

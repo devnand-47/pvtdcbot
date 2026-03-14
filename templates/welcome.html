@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% set active_page = "welcome" %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+            <h1 class="text-3xl font-bold">Welcome Messages</h1>
+            <span
+                class="bg-green-500/10 text-green-400 border border-green-500/20 text-xs px-2 py-1 rounded">Active</span>
+        </div>
+        <p class="text-gray-400">Configure what happens when a new member joins your server.</p>
+    </div>
+
+    <form method="post" action="/dashboard/{{ guild.id }}/settings/welcome" class="space-y-6">
+        <div class="bg-cardbg rounded-2xl border border-gray-800 p-6 shadow-xl">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-800 pb-2">Join Message Configuration</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Target Channel ID</label>
+                    <select name="welcome_channel_id"
+                        class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition appearance-none">
+                        <option value="">-- Disabled --</option>
+                        {% for channel in bot_data.channels %}
+                        <option value="{{ channel.id }}" {% if welcome_channel_id|string==channel.id %}selected{% endif
+                            %}>#{{ channel.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Autorole ID</label>
+                    <select name="autorole_id"
+                        class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition appearance-none">
+                        <option value="">-- None --</option>
+                        {% for role in bot_data.roles %}
+                        <option value="{{ role.id }}" {% if autorole_id|string==role.id %}selected{% endif %}>@{{
+                            role.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-gray-500 mt-2">Automatically assigned when a user joins.</p>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="bg-cardbg rounded-xl border border-gray-800 p-8 shadow-2xl relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        {% if request.query_params.get('success') %}
+        <div
+            class="mb-6 p-4 bg-green-900/40 border border-green-500 rounded-lg text-green-400 font-semibold shadow-[0_0_15px_rgba(0,255,0,0.1)]">
+            ✅ Welcome settings successfully saved!
+        </div>
+        {% endif %}
+
+        {% if request.query_params.get('simulated') %}
+        <div
+            class="mb-6 p-4 bg-blue-900/40 border border-blue-500 rounded-lg text-blue-400 font-semibold shadow-[0_0_15px_rgba(0,168,255,0.1)]">
+            🚀 Simulation request sent to the bot! Check your server to preview the welcome message.
+        </div>
+        {% endif %}
+
+        <form action="/dashboard/{{ guild.id }}/settings/welcome" method="POST" class="space-y-6 relative z-10">
+            <h3 class="text-xl font-bold mb-4 border-b border-gray-800 pb-2">Embed Designer</h3>
+
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Welcome Title</label>
+                        <input type="text" name="welcome_title" value="{{ welcome_title }}"
+                            class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Embed Color (Hex)</label>
+                        <div class="flex items-center gap-3">
+                            <input type="color" name="welcome_color" value="{{ welcome_color }}"
+                                class="w-12 h-12 rounded cursor-pointer bg-transparent border-none p-0">
+                            <input type="text" value="{{ welcome_color }}" readonly
+                                class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-gray-400">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Message Description</label>
+                    <textarea name="welcome_message" rows="4"
+                        class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition font-mono text-sm leading-relaxed">{{ welcome_message }}</textarea>
+                    <p class="text-xs text-gray-500 mt-2">Supported variables: <code
+                            class="text-accent bg-accent/10 px-1 py-0.5 rounded">{mention}</code> <code
+                            class="text-accent bg-accent/10 px-1 py-0.5 rounded">{server}</code> <code
+                            class="text-accent bg-accent/10 px-1 py-0.5 rounded">{member_count}</code> <code
+                            class="text-accent bg-accent/10 px-1 py-0.5 rounded">{username}</code> <code
+                            class="text-accent bg-accent/10 px-1 py-0.5 rounded">{display_name}</code> <code
+                            class="text-accent bg-accent/10 px-1 py-0.5 rounded">{avatar}</code></p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Attached Image URL</label>
+                    <input type="text" name="welcome_image_url" value="{{ welcome_image_url }}"
+                        class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition"
+                        placeholder="https://imgur.com/... (Supports {avatar} variable)">
+                </div>
+
+                <div
+                    class="bg-gray-800/40 border border-gray-700 p-5 rounded-lg flex justify-between items-center transition hover:border-accent/50 hover:bg-accent/5 mt-4">
+                    <div class="pr-4">
+                        <h4 class="font-semibold text-white">Generate Dynamic Welcome Card</h4>
+                        <p class="text-xs text-gray-400 mt-1">If enabled, the bot will automatically render and attach a
+                            beautiful graphical card containing the user's avatar and name. (Overrides Attached Image
+                            URL!)</p>
+                        <input type="hidden" name="welcome_card_enabled" value="0">
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                        <input type="checkbox" name="welcome_card_enabled" value="1" class="sr-only peer" {% if
+                            welcome_card_enabled==1 %}checked{% endif %}>
+                        <div
+                            class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent">
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Card Background Theme</label>
+                    <select name="welcome_card_theme"
+                        class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition appearance-none cursor-pointer">
+                        <option value="default" {% if welcome_card_theme=='default' %}selected{% endif %}>Technology
+                            (Default)</option>
+                        <option value="random" {% if welcome_card_theme=='random' %}selected{% endif %}>Random Game
+                            (GTA, PUBG, Minecraft)</option>
+                        <option value="custom" {% if welcome_card_theme=='custom' %}selected{% endif %}>Custom (Uses
+                            Attached Image URL above)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="pt-4 flex gap-4">
+                <button type="submit"
+                    class="bg-accent hover:bg-blue-500 text-white px-8 py-3 rounded-lg font-bold shadow-[0_0_15px_rgba(0,168,255,0.3)] transition w-full md:w-auto">
+                    Save Welcome Settings
+                </button>
+                <button type="submit" formaction="/dashboard/{{ guild.id }}/settings/welcome/simulate"
+                    class="bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white px-8 py-3 rounded-lg font-bold transition w-full md:w-auto">
+                    Simulate Welcome
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

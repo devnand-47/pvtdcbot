@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% set active_page = "broadcast" %}
+
+{% block content %}
+<div class="max-w-4xl">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Broadcast & Announce</h1>
+        <p class="text-gray-400">Instantly push messages directly to a selected channel from the web.</p>
+    </div>
+
+    <form method="post" action="/dashboard/{{ guild.id }}/broadcast" class="space-y-6">
+        <div class="bg-cardbg rounded-2xl border border-gray-800 p-6 shadow-xl relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none"></div>
+
+            <div class="mb-4">
+                <h2 class="text-xl font-bold text-white">Manual Broadcast</h2>
+                <p class="text-xs text-gray-400">Send an immediate announcement embed.</p>
+            </div>
+
+            <div class="space-y-6 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Target Channel ID</label>
+                        <select name="channel_id"
+                            class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition shadow-inner appearance-none"
+                            required>
+                            <option value="" disabled selected>-- Select a Channel --</option>
+                            {% for channel in bot_data.channels %}
+                            <option value="{{ channel.id }}" {% if default_announce_id|string==channel.id %}selected{%
+                                endif %}>#{{ channel.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Broadcast Title</label>
+                        <input type="text" name="title" value="⚠ Network-Wide Broadcast"
+                            class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition shadow-inner"
+                            required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Embed Color (Hex)</label>
+                        <div class="flex items-center gap-3">
+                            <input type="color" name="color" value="#00FFFF"
+                                class="w-12 h-12 rounded cursor-pointer bg-transparent border-none p-0">
+                            <input type="text" value="#00FFFF" readonly
+                                class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-gray-400 shadow-inner">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Message Content</label>
+                    <textarea name="message" rows="5"
+                        class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition shadow-inner font-mono text-sm"
+                        placeholder="Enter broadcast text..." required></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-8 border-t border-gray-800 pt-6">
+                <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition transform hover:-translate-y-1 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    Send Broadcast Instantly
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="mt-8">
+        <form method="post" action="/dashboard/{{ guild.id }}/settings/updates_channel">
+            <div class="bg-cardbg rounded-2xl border border-gray-800 p-6 shadow-xl relative overflow-hidden group">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-white">Bot Restart & Feature Notifications</h2>
+                    <p class="text-xs text-gray-400">Select where the bot will post an alert when it goes offline for
+                        maintenance, and when it comes back online with new features.</p>
+                </div>
+
+                {% if request.query_params.get('success_updates') %}
+                <div
+                    class="mb-6 p-4 bg-green-900/40 border border-green-500 rounded-lg text-green-400 font-semibold shadow-[0_0_15px_rgba(0,255,0,0.1)]">
+                    ✅ Update Channel saved successfully!
+                </div>
+                {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Bot Updates Channel</label>
+                        <select name="updates_channel_id"
+                            class="w-full bg-[#0b0e14] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition shadow-inner appearance-none">
+                            <option value="">-- Disabled --</option>
+                            {% for channel in bot_data.channels %}
+                            <option value="{{ channel.id }}" {% if updates_channel_id|string==channel.id %}selected{%
+                                endif %}>#{{ channel.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-6 border-t border-gray-800 pt-6">
+                    <button type="submit"
+                        class="bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-green-600/20 transition transform hover:-translate-y-1 flex items-center gap-2">
+                        Save Notification Channel
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

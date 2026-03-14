@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltimateBot | Professional Server Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkblue: '#141824',
+                        cardbg: '#1c2130',
+                        accent: '#00a8ff',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #141824;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Floating Hexagons Animation */
+        .hexagon {
+            position: absolute;
+            background: rgba(0, 168, 255, 0.8);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            box-shadow: 0 0 40px rgba(0, 168, 255, 0.5);
+            animation: float 10s infinite ease-in-out alternate;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg) scale(1.0);
+                filter: blur(2px) drop-shadow(0 0 20px #00a8ff);
+            }
+
+            100% {
+                transform: translateY(-40px) rotate(20deg) scale(1.1);
+                filter: blur(5px) drop-shadow(0 0 40px #00a8ff);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased relative">
+
+    <!-- Top Nav -->
+    <header
+        class="flex items-center justify-between px-8 py-5 relative z-10 sticky top-0 bg-darkblue/90 backdrop-blur-md border-b border-gray-800/50">
+        <div class="flex items-center gap-3">
+            <div
+                class="w-10 h-10 rounded bg-accent flex items-center justify-center text-white font-bold text-xl shadow-[0_0_20px_rgba(0,168,255,0.4)]">
+                🤖</div>
+            <h1 class="text-2xl font-bold tracking-tight">UltimateBot</h1>
+        </div>
+
+        <nav class="hidden md:flex gap-8 text-sm font-semibold text-gray-300">
+            <a href="/" class="text-white hover:text-accent border-b-2 border-accent pb-1">Home</a>
+            <a href="#" class="hover:text-accent transition">About</a>
+            <a href="#" class="hover:text-accent transition">Status</a>
+            <a href="#" class="hover:text-accent transition">Custom Branding</a>
+        </nav>
+
+        <div>
+            {% if user %}
+            <a href="/servers"
+                class="bg-accent hover:bg-blue-500 text-white px-6 py-2.5 rounded-full font-bold shadow-[0_0_20px_rgba(0,168,255,0.4)] transition">Open
+                dashboard</a>
+            {% else %}
+            <a href="/login/discord"
+                class="bg-accent hover:bg-blue-500 text-white px-6 py-2.5 rounded-full font-bold shadow-[0_0_20px_rgba(0,168,255,0.4)] transition">Login
+                with Discord</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="flex-1 flex items-center justify-center relative px-6 py-20 pb-40">
+        <!-- Floating Hexagons Background -->
+        <div class="absolute inset-0 z-0 pointer-events-none">
+            <div class="hexagon w-16 h-16 top-[20%] right-[30%] delay-[0ms]" style="animation-duration: 8s;"></div>
+            <div class="hexagon w-20 h-20 bottom-[30%] right-[15%] delay-[2000ms]"
+                style="background: rgba(88, 101, 242, 0.8);"></div>
+            <div class="hexagon w-12 h-12 bottom-[10%] left-[20%] delay-[4000ms]"></div>
+            <div class="hexagon w-24 h-24 top-[40%] right-[8%] delay-[1000ms]" style="animation-duration: 12s;"></div>
+            <div class="hexagon w-14 h-14 top-[50%] left-[8%] delay-[3000ms]"
+                style="background: rgba(88, 101, 242, 0.8);"></div>
+        </div>
+
+        <div class="max-w-7xl w-full grid md:grid-cols-2 gap-12 items-center relative z-10">
+
+            <div class="space-y-8">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-500 to-accent flex items-center justify-center shadow-[0_0_50px_rgba(0,168,255,0.5)]">
+                        <span class="text-4xl">🤖</span>
+                    </div>
+                    <h2 class="text-6xl font-extrabold tracking-tight">UltimateBot</h2>
+                </div>
+
+                <div class="space-y-3">
+                    <p class="text-2xl font-bold text-gray-200">Multi-purpose Discord Bot.</p>
+                    <p class="text-2xl font-bold text-gray-200">Fully customizable.</p>
+                    <p class="text-2xl font-bold text-gray-200">Completely free.</p>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <a href="/servers"
+                        class="bg-accent hover:bg-blue-500 text-white px-8 py-3.5 rounded-full font-bold shadow-[0_0_30px_rgba(0,168,255,0.4)] transition hover:scale-105 transform">Add
+                        to Discord</a>
+                    <a href="#features"
+                        class="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3.5 rounded-full font-bold transition border border-gray-700">Explore
+                        features</a>
+                </div>
+            </div>
+
+            <div class="hidden md:block">
+                <!-- Empty Space for visual balance against the floating hexagons -->
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-sm text-gray-500 relative z-10">
+        &copy; 2026 UltimateBot &bull; Terms &bull; Privacy &bull; Legal Notice
+    </footer>
+</body>
+
+</html>

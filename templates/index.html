@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% set active_page = "home" %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">Welcome <span class="text-accent">{{ user.username }}</span>,</h1>
+    <p class="text-gray-400">find common dashboard metrics below.</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-cardbg rounded-2xl border border-gray-800 p-6 shadow-xl relative overflow-hidden group">
+        <div
+            class="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none">
+        </div>
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h3 class="text-xl font-bold">Activity Logs</h3>
+                <p class="text-sm text-gray-500 mt-1">Recent moderation actions</p>
+            </div>
+            <div class="p-2 bg-gray-800/50 rounded-lg text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="h-[250px] overflow-y-auto mt-2 rounded-xl border border-gray-800 bg-[#0b0e14]">
+            <ul class="text-sm divide-y divide-gray-800">
+                {% for log in logs_data %}
+                <li class="p-3 hover:bg-white/5 transition flex flex-col gap-1">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-gray-200 capitalize">{{ log.action }}</span>
+                        <span class="text-xs text-gray-500 font-mono">{{ log.timestamp }}</span>
+                    </div>
+                    <div class="text-gray-400 text-xs flex justify-between">
+                        <span class="truncate pr-2"><span class="text-gray-500">Target:</span> {% if log.target != '-'
+                            %}{{ log.target }}{% else %}-{% endif %}</span>
+                        <span class="text-right flex-shrink-0"><span class="text-gray-500">Actor:</span> {% if log.actor
+                            != '-' %}{{ log.actor }}{% else %}-{% endif %}</span>
+                    </div>
+                    {% if log.reason and log.reason != '-' %}
+                    <div class="text-xs text-gray-500 mt-1 italic opacity-80 pl-2 border-l-2 border-gray-700">"{{
+                        log.reason }}"</div>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="p-4 text-gray-500 text-sm italic text-center">No logs found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="bg-cardbg rounded-2xl border border-gray-800 p-6 shadow-xl relative overflow-hidden group">
+        <div
+            class="absolute inset-0 bg-gradient-to-l from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none">
+        </div>
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h3 class="text-xl font-bold">Action Statistics</h3>
+                <p class="text-sm text-gray-500 mt-1">Actions performed over time</p>
+            </div>
+            <div class="p-2 bg-gray-800/50 rounded-lg text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                </svg>
+            </div>
+        </div>
+        <div id="chart" class="w-full h-[250px] mt-2 bg-[#0b0e14] border border-gray-800 rounded-xl relative"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script>
+    var statData = {{ stats_json | safe }};
+    var chartDom = document.getElementById('chart');
+    var myChart = echarts.init(chartDom, 'dark');
+
+    var option = {
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis' },
+        legend: { data: statData.series.map(s => s.name), top: 10, textStyle: { color: '#9ca3af' } },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: { type: 'category', boundaryGap: false, data: statData.labels, axisLine: { lineStyle: { color: '#374151' } } },
+        yAxis: { type: 'value', splitLine: { lineStyle: { color: '#1f2937' } } },
+        series: statData.series
+    };
+
+    option && myChart.setOption(option);
+    window.addEventListener('resize', myChart.resize);
+</script>
+{% endblock %}

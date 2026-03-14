@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% set active_page = "tickets" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-3xl font-bold tracking-tight text-white mb-1">Support Tickets</h2>
+            <p class="text-gray-400 text-sm">Configure categories and roles for the community support ticket system.</p>
+        </div>
+        <div
+            class="px-3 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full text-xs font-medium">
+            Active
+        </div>
+    </div>
+
+    {% if request.query_params.get("success") %}
+    <div class="p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-3 text-green-400">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span class="font-medium">Ticket settings successfully saved!</span>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/dashboard/{{ guild.id }}/settings/tickets" class="space-y-6">
+
+        <div class="bg-cardbg rounded-xl border border-gray-800 shadow-xl overflow-hidden">
+            <div class="p-6 border-b border-gray-800">
+                <h3 class="text-lg font-bold text-white mb-1">System Configuration</h3>
+                <p class="text-sm text-gray-400">To enable tickets, you must configure a Transcript Category.</p>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Ticket Category -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Ticket Category ID</label>
+                    <select name="ticket_category_id"
+                        class="w-full bg-darkblue border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition">
+                        <option value="">-- Disabled --</option>
+                        {% for cat in bot_data.categories %}
+                        <option value="{{ cat.id }}" {% if data.ticket_category_id==cat.id|string %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-gray-500 mt-2">The category folder where new private ticket channels will
+                        spawn.</p>
+                </div>
+
+                <!-- Support Roles -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Support Staff Roles</label>
+                    <select name="ticket_role_ids" multiple
+                        class="w-full bg-darkblue border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition min-h-[120px]">
+                        <option value="" {% if not data.ticket_roles %}selected{% endif %}>-- Server Admins Only --
+                        </option>
+                        {% for role in bot_data.roles %}
+                        <option value="{{ role.id }}" {% if role.id|string in data.ticket_roles %}selected{% endif %}>
+                            @{{ role.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-gray-500 mt-2">Which roles should be pinged and given access when a user
+                        opens a ticket. Hold CTRL/CMD to select multiple.</p>
+                </div>
+
+                <!-- Log Channel -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">Transcripts Log Channel</label>
+                    <select name="ticket_log_channel_id"
+                        class="w-full bg-darkblue border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition">
+                        <option value="">-- None --</option>
+                        {% for ch in bot_data.channels %}
+                        <option value="{{ ch.id }}" {% if data.ticket_log_channel_id==ch.id|string %}selected{% endif
+                            %}>
+                            #{{ ch.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-gray-500 mt-2">Where transcript HTML files are saved when a ticket is
+                        resolved and closed.</p>
+                </div>
+
+            </div>
+            <div class="px-6 py-4 bg-gray-900/50 border-t border-gray-800 flex justify-end">
+                <button type="submit"
+                    class="px-6 py-2 bg-accent hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg shadow-accent/30 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Save Configuration
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="bg-cardbg rounded-xl border border-gray-800 shadow-xl overflow-hidden p-6 mt-6">
+        <h3 class="text-lg font-bold text-white mb-2">How to spawn the Ticket Panel</h3>
+        <p class="text-sm text-gray-400">Once your settings above are configured, go to your Discord server and type
+            <kbd class="px-2 py-1 bg-gray-800 rounded mx-1 text-accent font-mono text-xs">/ticket setup</kbd> in a
+            public channel. The bot will drop a permanent interactive Ticket Pad button there that users can click to
+            request support!
+        </p>
+    </div>
+</div>
+{% endblock %}
