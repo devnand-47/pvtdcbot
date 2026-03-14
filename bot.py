@@ -13,6 +13,16 @@ import logging
 
 from config import TOKEN, GUILD_ID, DB_PATH
 
+
+async def keep_alive():
+    while True:
+        try:
+            async with aiohttp.ClientSession() as session:
+                await session.get("https://pvtdcbot.onrender.com")
+        except:
+            pass
+        await asyncio.sleep(240)  # 4 minutes
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
