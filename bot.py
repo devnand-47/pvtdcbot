@@ -1,5 +1,4 @@
 # bot.py
-
 import os
 import sys
 import time
@@ -12,16 +11,6 @@ import aiosqlite
 import logging
 
 from config import TOKEN, GUILD_ID, DB_PATH
-
-
-async def keep_alive():
-    while True:
-        try:
-            async with aiohttp.ClientSession() as session:
-                await session.get("https://pvtdcbot.onrender.com")
-        except:
-            pass
-        await asyncio.sleep(240)  # 4 minutes
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,7 +25,6 @@ log = logging.getLogger("UltimateBot")
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
-
 
 class UltimateBot(commands.Bot):
     def __init__(self):
@@ -63,21 +51,21 @@ class UltimateBot(commands.Bot):
             "cogs.backups",
             "cogs.tickets",
             "cogs.fun",
-            "cogs.automod",      # NEW
-            "cogs.moderation",   # NEW
-            "cogs.ai",           # NEW
-            "cogs.help",         # NEW
-            "cogs.voice_logs",   # NEW
-            "cogs.levels",       # NEW
-            "cogs.custom_commands", # NEW
-            "cogs.reaction_roles",  # NEW
-            "cogs.afk",          # NEW
-            "cogs.youtube",      # NEW
-            "cogs.birthday",     # NEW
-            "cogs.moderation_extended", # NEW
-            "cogs.stats_channels", # NEW
-            "cogs.music",        # NEW
-            "cogs.soundboard",   # NEW
+            "cogs.automod",      
+            "cogs.moderation",   
+            "cogs.ai",           
+            "cogs.help",         
+            "cogs.voice_logs",   
+            "cogs.levels",       
+            "cogs.custom_commands", 
+            "cogs.reaction_roles",  
+            "cogs.afk",          
+            "cogs.youtube",      
+            "cogs.birthday",     
+            "cogs.moderation_extended", 
+            "cogs.stats_channels", 
+            "cogs.music",        
+            "cogs.soundboard",   
             "cogs.giveaway",
             "cogs.economy",
             "cogs.starboard",
@@ -101,20 +89,9 @@ class UltimateBot(commands.Bot):
         # Start IPC Server for Dashboard
         self.loop.create_task(self.start_ipc_server())
 
-        # Sync slash commands
-        try:
-            if GUILD_ID:
-                guild_obj = discord.Object(id=GUILD_ID)
-                self.tree.copy_global_to(guild=guild_obj)
-                await self.tree.sync(guild=guild_obj)
-                log.info(f"[SYNC] Slash commands synced to guild {GUILD_ID}")
-            else:
-                await self.tree.sync()
-                log.info("[SYNC] Slash commands synced globally")
-        except discord.Forbidden as e:
-            log.warning(f"[SYNC] Forbidden when syncing to guild {GUILD_ID}: {e}")
-            log.info("[SYNC] Falling back to global sync...")
-            await self.tree.sync()
+        # --- CHANGED: Removed automatic syncing to prevent Rate Limits ---
+        log.info("[SYNC] Skipped automatic sync to prevent API bans.")
+        log.info("Use the '!sync' command in Discord to update slash commands manually.")
 
     async def _init_db(self):
         assert self.db is not None
@@ -224,7 +201,6 @@ class UltimateBot(commands.Bot):
             """
         )
         
-        # Schema fallback migrations for existing SQLite databases
         for col_query in [
             "ALTER TABLE guild_settings ADD COLUMN updates_channel_id INTEGER",
             "ALTER TABLE guild_settings ADD COLUMN afk_move_enabled INTEGER DEFAULT 0",
@@ -333,7 +309,6 @@ class UltimateBot(commands.Bot):
             from aiohttp import web
             return web.json_response({"error": "WelcomeCog not loaded"}, status=500)
             
-        # Fire the event manually
         self.loop.create_task(welcome_cog.on_member_join(member))
         
         from aiohttp import web
@@ -386,7 +361,6 @@ class UltimateBot(commands.Bot):
             from aiohttp import web
             return web.json_response({"error": "Destination channel not found"}, status=404)
         
-        # We need to construct the persistent view
         from cogs.reaction_roles import ReactionRoleView
         import json
         
@@ -421,9 +395,6 @@ class UltimateBot(commands.Bot):
         from aiohttp import web
         return web.json_response({"success": True})
 
-
-    # ---------- System Control Endpoints ----------
-
     async def handle_ipc_system(self, request):
         from aiohttp import web
         import asyncio
@@ -438,7 +409,6 @@ class UltimateBot(commands.Bot):
         process = psutil.Process(os.getpid())
         ram_mb = process.memory_info().rss / 1024 / 1024
         
-        # prime the cpu_percent
         process.cpu_percent(interval=None)
         await asyncio.sleep(0.1)
         cpu_perc = process.cpu_percent(interval=None)
@@ -446,7 +416,6 @@ class UltimateBot(commands.Bot):
         uptime_s = time.time() - process.create_time()
         ping_ms = round(self.latency * 1000)
 
-        # Format uptime
         m, s = divmod(int(uptime_s), 60)
         h, m = divmod(m, 60)
         d, h = divmod(h, 24)
@@ -476,7 +445,6 @@ class UltimateBot(commands.Bot):
         except ValueError:
             return web.json_response({"error": "Invalid guild ID"}, status=400)
 
-        # Announce restart intention if channel is configured
         cursor = await self.db.execute("SELECT updates_channel_id FROM guild_settings WHERE guild_id = ?", (guild.id,))
         row = await cursor.fetchone()
         updates_channel_id = row[0] if row and row[0] else None
@@ -495,7 +463,6 @@ class UltimateBot(commands.Bot):
                 except discord.Forbidden:
                     pass
 
-        # Set the restart flag so it announces when it boots back up
         features = "Dashboard triggered reboot completed."
         await self.db.execute(
             """
@@ -510,10 +477,7 @@ class UltimateBot(commands.Bot):
 
         log.warning(f"[{guild.name}] Initiating dashboard restart trigger.")
         
-        # Give DB and Discord a second to flush out the message
         await asyncio.sleep(1.0)
-        
-        # Completely reload script
         os.execv(sys.executable, ['python'] + sys.argv)
         return web.json_response({"status": "restarting"})
         
@@ -529,7 +493,6 @@ class UltimateBot(commands.Bot):
         except ValueError:
             return web.json_response({"error": "Invalid guild ID"}, status=400)
 
-        # Get the update channel
         cursor = await self.db.execute("SELECT updates_channel_id FROM guild_settings WHERE guild_id = ?", (guild.id,))
         row = await cursor.fetchone()
         
@@ -549,7 +512,6 @@ class UltimateBot(commands.Bot):
                 except discord.Forbidden:
                     pass
                 
-        # Set the restart flag so it announces when it boots back up manually
         await self.db.execute(
             """
             INSERT INTO restart_flags (guild_id, pending, features, channel_id)
@@ -563,12 +525,31 @@ class UltimateBot(commands.Bot):
         
         log.warning(f"[{guild.name}] Initiating dashboard shutdown trigger.")
         await self.close()
-        # Force exit to ensure process stops cleanly
         os._exit(0)
         return web.json_response({"status": "shutting_down"})
 
 bot = UltimateBot()
 
+@bot.command(name="sync", help="Manually syncs slash commands to Discord.")
+@commands.has_permissions(administrator=True)
+async def sync_commands(ctx):
+    """
+    Manually syncs your slash commands with Discord.
+    Usage: !sync
+    """
+    await ctx.send("⏳ Syncing slash commands with Discord... Please wait.")
+    try:
+        if GUILD_ID:
+            bot.tree.copy_global_to(guild=discord.Object(id=GUILD_ID))
+            synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+            await ctx.send(f"✅ Successfully synced {len(synced)} slash commands to your guild!")
+        else:
+            synced = await bot.tree.sync()
+            await ctx.send(f"✅ Successfully synced {len(synced)} slash commands globally!")
+        log.info(f"[SYNC] Owner manually synced {len(synced)} commands.")
+    except Exception as e:
+        await ctx.send(f"❌ Failed to sync: {e}")
+        log.error(f"[SYNC] Manual sync failed: {e}")
 
 @bot.event
 async def on_ready():
@@ -577,7 +558,6 @@ async def on_ready():
     for g in bot.guilds:
         log.info(f"- {g.name} ({g.id})")
         
-    # Check for restart flags
     if getattr(bot, "db", None):
         try:
             await bot.db.execute("ALTER TABLE restart_flags ADD COLUMN channel_id INTEGER")
@@ -596,7 +576,6 @@ async def on_ready():
                     channel = guild.get_channel(flag_channel_id)
                     
                 if not channel:
-                    # Fallback
                     c_cursor = await bot.db.execute("SELECT updates_channel_id FROM guild_settings WHERE guild_id = ?", (g_id,))
                     c_row = await c_cursor.fetchone()
                     if c_row and c_row[0]:
@@ -614,11 +593,9 @@ async def on_ready():
                     except discord.Forbidden:
                         pass
             
-            # Reset flag
             await bot.db.execute("UPDATE restart_flags SET pending = 0 WHERE guild_id = ?", (g_id,))
             
         await bot.db.commit()
-
 
 if __name__ == "__main__":
     if not TOKEN or TOKEN == "YOUR_BOT_TOKEN_HERE":
