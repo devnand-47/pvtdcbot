@@ -53,7 +53,7 @@ class StatsChannelsCog(commands.Cog):
         )
         await self.bot.db.commit()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=15)
     async def update_stats(self):
         for guild in self.bot.guilds:
             data = await self.get_stat_channels(guild.id)
@@ -74,6 +74,7 @@ class StatsChannelsCog(commands.Cog):
                     await boosts_channel.edit(name=f"💎 Boosts: {guild.premium_subscription_count}")
             except Exception as e:
                 print(f"[Stats] Error updating channels for {guild.name}: {e}")
+                await asyncio.sleep(2)
 
     @update_stats.before_loop
     async def before_update(self):
