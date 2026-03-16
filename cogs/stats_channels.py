@@ -5,8 +5,6 @@ from discord.ext import commands, tasks
 from discord import app_commands
 from config import ADMIN_ROLE_IDS
 
-
-
 def is_admin():
     async def predicate(interaction: discord.Interaction):
         member = interaction.user
@@ -18,7 +16,6 @@ def is_admin():
         await interaction.response.send_message("❌ Admin only.", ephemeral=True)
         raise app_commands.CheckFailure("Not admin")
     return app_commands.check(predicate)
-
 
 class StatsChannelsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -67,16 +64,29 @@ class StatsChannelsCog(commands.Cog):
             boosts_channel = guild.get_channel(data["boosts"])
 
             try:
+                # 1. Calculate the new names
+                new_members_name = f"👥 Members: {guild.member_count:,}"
+                
                 online_count = sum(1 for m in guild.members if m.status != discord.Status.offline)
-                if members_channel:
-                    await members_channel.edit(name=f"👥 Members: {guild.member_count:,}")
-                if online_channel:
-                    await online_channel.edit(name=f"🟢 Online: {online_count:,}")
-                if boosts_channel:
-                    await boosts_channel.edit(name=f"💎 Boosts: {guild.premium_subscription_count}")
+                new_online_name = f"🟢 Online: {online_count:,}"
+                
+                new_boosts_name = f"💎 Boosts: {guild.premium_subscription_count}"
+
+                # 2. Check if the name actually needs to be changed before editing
+                if members_channel and members_channel.name != new_members_name:
+                    await members_channel.edit(name=new_members_name)
+                    
+                if online_channel and online_channel.name != new_online_name:
+                    await online_channel.edit(name=new_online_name)
+                    
+                if boosts_channel and boosts_channel.name != new_boosts_name:
+                    await boosts_channel.edit(name=new_boosts_name)
+
             except Exception as e:
                 print(f"[Stats] Error updating channels for {guild.name}: {e}")
-                await asyncio.sleep(2)
+            
+            # 3. This MUST be outside the try/except block so it pauses for EVERY server!
+            await asyncio.sleep(2)
 
     @update_stats.before_loop
     async def before_update(self):
@@ -112,7 +122,7 @@ class StatsChannelsCog(commands.Cog):
             await self.save_stat_channels(guild.id, category.id, members_ch.id, online_ch.id, boosts_ch.id)
 
             await interaction.followup.send(
-                f"✅ Stats channels created in category **{category.name}**!\nThey will update automatically every **10 minutes**.",
+                f"✅ Stats channels created in category **{category.name}**!\nThey will update automatically every **15 minutes**.",
                 ephemeral=True
             )
 
@@ -150,7 +160,6 @@ class StatsChannelsCog(commands.Cog):
         await self.bot.db.execute("DELETE FROM stats_channels WHERE guild_id = ?", (guild.id,))
         await self.bot.db.commit()
         await interaction.followup.send("✅ Stats channels removed.", ephemeral=True)
-
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(StatsChannelsCog(bot))
